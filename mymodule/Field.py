@@ -18,6 +18,7 @@
 from ship import Ship
 from game_funcs import convert_ltr_coord, is_valid, ship_size
 
+
 class Field(object):
     def __init__(self):
         def generate_field():
@@ -39,7 +40,7 @@ class Field(object):
                     return "h"  # horizontal
                 return "v"  # vertical
 
-            def situate_ship(ship_size, free_cells, field):
+            def situate_ship(ship_size, free_cells, field, oo_field):
                 """
                 (int), (list), (list) -> (list), (list)
                 This function takes a ship size, list of cells available for situation, a field itself and randomly generates
@@ -63,6 +64,8 @@ class Field(object):
                                 pass
                     for i in range(ship_size):
                         field[random_coord[0] + i][random_coord[1]] = "*"
+                        new_ship = Ship(random_coord, False, ship_size)
+                        oo_field[random_coord[0]+i][random_coord[1]] = new_ship
 
                 if angle == "h":
                     for c1 in [-1, 0, 1]:
@@ -73,7 +76,9 @@ class Field(object):
                                 pass
                     for i in range(ship_size):
                         field[random_coord[0]][random_coord[1] + i] = "*"
-                return [free_cells, field, random_coord, angle]
+                        new_ship = Ship(random_coord, True, ship_size)
+                        oo_field[random_coord[0]][random_coord[1] + i] = new_ship
+                return [free_cells, field, oo_field]
 
             while True:
                 availible_cells = [(i, j) for j in range(10) for i in range(10)]
@@ -81,17 +86,11 @@ class Field(object):
                 oo_field = [[Ship((r, c), True, 0) for c in range(10)] for r in range(10)]
                 for num in range(1, 5):
                     if num == 1:
-                        after_ship = situate_ship(1, availible_cells, field)
-                        oo_field[after_ship[2][0]][after_ship[2][1]] = Ship(after_ship[2],
-                                                                            True if after_ship[3][0] == "h" else False,
-                                                                            num)
+                        after_ship = situate_ship(1, availible_cells, field, oo_field)
 
                     for times in range(5 - num):
-                        after_ship = situate_ship(num, availible_cells, field)
-                        availible_cells, field = after_ship[0], after_ship[1]
-                        oo_field[after_ship[2][0]][after_ship[2][1]] = Ship(after_ship[2],
-                                                                            True if after_ship[3] == "h" else False,
-                                                                            5-num)
+                        after_ship = situate_ship(num, availible_cells, field, oo_field)
+                        availible_cells, field, oo_field = after_ship[0], after_ship[1], after_ship[2]
 
                 if is_valid(field):
                     return field, oo_field
