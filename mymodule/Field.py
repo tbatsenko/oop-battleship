@@ -1,6 +1,6 @@
 # File: field.py
 from ship import Ship
-from game_funcs import convert_ltr_coord, is_valid, ship_size
+from game_funcs import convert_ltr_coord, is_valid, ship_size, field_to_str
 
 
 class Field(object):
