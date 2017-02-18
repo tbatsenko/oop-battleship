@@ -1,30 +1,26 @@
-"""
-Клас Ship Атрибути:
-● bow ​— ​tuple з координатами типу int, що означають розміщення лівого верхнього кута кораблю (корми);
-● horizontal — змінна типу bool, що означає напрямок розміщення напрямку; 
-● length — розмір корабля, наприклад лінкор має розмір (1, 4); атрибут повинен бути приватним; 
-● hit ​—​ список bool, що відповідає тому чи суперник влучив у відповідну частину корабля; атрибут має бути приватним
+# File: ship.py
 
- Методи:
-● __init__(length) — у ініціалізаторі атрибуту length повинно присвоюватися передане значення, а також повинні
-створюватися атрибути із значеннями за замовчування; 
-● shoot_at(tuple) — виконує операцію, яка відображає те,
- що у класі Ship суперник влучив у частину відповідну частину корабля.
-"""
+
 class Ship(object):
     def __init__(self, bow, horizontal, length):
+        """
+        This method initializes an instance of Ship class.
+        :param bow: (tuple) start coord of the ship
+        :param horizontal: (bool) - if ship situated horizontal
+        :param length: (int) - length of the ship
+        """
         self.bow = bow
         self.horizontal = horizontal
-        self.__length = length  # just int value
-        self.__hit = [False for i in range(length)]
+        self.__length = length
+        self.__hit = [False] * length  # lst of bool if ship's part id damaged
 
-    def shoot_at(self, coord):
-        if self.horizontal:
-            ship_cells = [(self.bow[0], self.bow[1] + i) for i in range(self.__length)]
-            try:
-                ship_part_coord = ship_cells.index(coord)
-                
-                return True, self
-            except ValueError:
-                return False, coord
-                
+    def shoot_at(self, crd):
+        """
+        This method takes a coord of ship and makes it damaged.
+        :param crd: coord that was shooten at
+        :return: None
+        """
+        if self.__length:
+            self.__hit[abs(crd[0] + crd[1] - self.bow[0] - self.bow[1])] = True
+        else:
+            self.__hit = [True]

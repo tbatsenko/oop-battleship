@@ -4,9 +4,10 @@ from game_funcs import convert_ltr_coord, is_valid, ship_size, field_to_str
 
 
 class Field(object):
-    shooted_cells = []
-
     def __init__(self):
+        """
+        This method initialize a new Field class instance.
+        """
         def generate_field():
             """
             (None) -> (data)
@@ -43,7 +44,7 @@ class Field(object):
                     free_cells = list(filter(
                         lambda item: item[1] < 11 - ship_size, free_cells))
                 if not free_cells:
-                    return free_cells, func_field
+                    return free_cells, func_field, func_oo_field
                 random_coord = random.choice(free_cells)
                 if angle == "v":
                     for c1 in [-1, 0, 1]:
@@ -76,7 +77,7 @@ class Field(object):
 
             while True:
                 availible_cells = [(i, j) for j in range(10) for i in range(10)]
-                field = [[" "] * 10] * 10
+                field = [[" " for j in range(10)] for i in range(10)]
                 oo_field = [[Ship((r, c), True, 0) for c in range(10)]
                             for r in range(10)]
                 for num in range(1, 5):
@@ -94,28 +95,34 @@ class Field(object):
 
                 if is_valid(field):
                     return field, oo_field
-
-        self.ships = generate_field()[1]
+        fields = generate_field()
+        self.ships = fields[1]
+        self.player_field = fields[0]
+        self.damaged_cells = [[" " for j in range(10)] for i in range(10)]
 
     def shoot_at(self, coord):
-        self.ships[coord[0]][coord[1]].shoot_at(coord)
-        pass
+        """
+        (tuple) -> (None)
+        This method reloads the field of rival after shooting.
+        """
+        valid_crd = (convert_ltr_coord(coord[0]), coord[1]-1)
+        self.ships[valid_crd[0]][valid_crd[1]].shoot_at(valid_crd)
+        self.damaged_cells[valid_crd[0]][valid_crd[1]] = "X"
 
     def field_without_ships(self):
-        pass
+        """
+        (None) -> (str)
+        This method returns a field of a rival of curr player with cells,
+        which were shooten.
+        """
+        return field_to_str(self.damaged_cells)
 
     def field_with_ships(self):
-        pass
-
-"""
-● shoot_at(tuple) — виконує операцію, яка означає,
- що суперник влучив у клітинку ігрового поля Field;.
-
-● field_without_ships() — повертає стрічку, що зображає лише ті клітинки
-ігрового поля, у які стріляв суперник;
-● field_with_ships() — повертає стрічку, що зображає поле з кораблями,
-а також усі клітинки у які стріляв суперник
-"""
-
-my_fld = Field()
-print(my_fld.ships)
+        """
+        (None) -> (str)
+        This method returns a field of current player with ships in str
+        """
+        player_field = [["X" if self.damaged_cells[i][j] == "X"
+                         else self.player_field[i][j]
+                         for j in range(10)] for i in range(10)]
+        return field_to_str(player_field)

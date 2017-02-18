@@ -64,7 +64,7 @@ def is_valid(data):
                 if matrix[i][j] != " ":
                     for i1, j1 in lst:
                         try:
-                            if matrix[i + i1][j + j1] == "*":
+                            if matrix[i + i1][j + j1] in ("*", "X"):
                                 return False
                         except:
                             pass
